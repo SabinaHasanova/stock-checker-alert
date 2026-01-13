@@ -4,13 +4,15 @@
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/short-sleeve-crochet-knit-jumper-p02142220.html",
     "size": "M",
-    "status": 1
+    "status": 1,
+    "price": 12.99
   },
   {
     "id": 2,
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/jacket-with-wool-and-pockets-p01255718.html?v1=480634333",
     "size": "S",
-    "status": 1
+    "status": 1,
+    "price": 19.99
   }
 ]

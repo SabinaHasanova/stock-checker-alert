@@ -1,26 +1,36 @@
 import fs from 'fs';
 import cron from 'node-cron';
 import { checkZaraAvailability } from './scraper.js';
-import { sendTelegramNotification } from './notifier.js';
+import { sendTelegramNotification,sendTelegramErrorNotification  } from './notifier.js';
 
-const products = JSON.parse(fs.readFileSync('./products.json'));
+
 
 
 async function runStockCheck() {
+  const products = JSON.parse(fs.readFileSync('./products.json'));
+  for (const product of products) {
+    if (product.status !== 1) continue;
 
+    try {
+      const inStock = await checkZaraAvailability(product);
 
- for (const product of products) {
-  if (product.status !== 1) continue;
+      if (inStock) {
+        await sendTelegramNotification(
+          product.userId,
+          `✅ In stock!\nSize: ${product.size || 'Any'}\n${product.url}`
+        );
+      }
 
-  const inStock = await checkZaraAvailability(product);
+    } catch (err) {
+      console.log('Global stock check error:', err.message);
 
-  if (inStock) {
-    await sendTelegramNotification(
-      product.userId,
-      `✅ In stock!\nSize: ${product.size}\n${product.url}`
-    );
+      await sendTelegramErrorNotification(
+        `❌ Stock checker crashed\nError: ${err.message}`
+      );
+    }
+ 
   }
-}
+  fs.writeFileSync('./products.json', JSON.stringify(products, null, 2));
 }
 
 await runStockCheck();
