@@ -1,18 +1,17 @@
 import { chromium } from 'playwright';
 import { handlePopupsAndCookies } from './handlePopupsAndCookies.js';
+import { sendTelegramErrorNotification,sendTelegramNotification  } from './notifier.js';
 
-export async function checkZaraAvailability(product) {
- const browser = await chromium.launch({
-  headless: false,
-  slowMo: 50,
-  args: [
-    '--window-position=-2000,0',   // 👈 ekranın kənarına atır
-    '--window-size=200,200',
-    '--disable-blink-features=AutomationControlled',
-    '--no-sandbox',
-    '--disable-dev-shm-usage'
-  ]
-});
+
+
+export async function checkZaraAvailability(product, retryCount = 0, browser = null, context = null) {
+
+  if (!browser) {
+    browser = await chromium.launch({
+      headless: false,
+      slowMo: 50,
+      args: ['--disable-blink-features=AutomationControlled']
+    });
 
 const context = await browser.newContext({
   viewport: { width: 200, height: 200 },
@@ -23,6 +22,7 @@ const context = await browser.newContext({
     'AppleWebKit/537.36 (KHTML, like Gecko) ' +
     'Chrome/120.0.0.0 Safari/537.36'
 });
+  }
 
 
   const page = await context.newPage();
@@ -48,12 +48,11 @@ const context = await browser.newContext({
  
    const inStock = await isInStockByButton(page);
 
-if (!inStock) {
-  return false;
-}
+    if (!inStock) {
+      return false;
+    }
 
-    
-      
+
      // 🔹 SIZE YOXDURSA → hər hansı stock varmı?
     if (!product.size) {
       
@@ -64,9 +63,47 @@ if (!inStock) {
     await page.click(addToCartSelector);
 
     // Bir az gözləyək ki size-lar render olunsun
-    await page.waitForTimeout(1500);
 
-   
+const currentPrice = await page.evaluate(() => {
+  const el = document.querySelector(
+    '[data-qa-qualifier="price-amount-current"] .money-amount__main'
+  );
+
+  if (!el) return null;
+
+  return parseFloat(
+    el.innerText
+      .replace(',', '.')
+      .replace(/[^\d.]/g, '')
+  );
+});
+
+if (currentPrice && product.price !== undefined && currentPrice !== product.price) {
+
+  const diff = currentPrice - product.price;
+  const direction = diff < 0 ? '📉 Price dropped' : '📈 Price increased';
+
+  await sendTelegramNotification(
+    product.userId,
+    `${direction}\nOld: ${product.price} \nNew: ${currentPrice} \n${product.url}`
+  );
+
+  product.price = currentPrice; // listdə yenilə
+
+}
+
+    // 🔹 SIZE YOXDURSA → hər hansı stock varmı?
+    if (!product.size) {
+      const inStock = await page.evaluate(() => {
+        return Array.from(
+          document.querySelectorAll(
+            'button.product-detail-size-selector-std-actions__button[data-qa-action="add-to-cart"]'
+          )
+        ).map(t => t.innerText.trim());
+      });
+
+      return inStock.length > 0;
+    }
 
     // 🔹 ENABLED + IN STOCK
     const availableSizes = await page.evaluate(() => {
@@ -94,9 +131,27 @@ if (!inStock) {
 
   } catch (err) {
     console.log('Retrying Zara check due to navigation...');
+
+    try {
+     await sendTelegramErrorNotification(     
+      `❌ Zara checker error\n\nProduct: ${product.url}\nError: ${err.message}`
+    );
+    } catch (notifyErr) {
+      console.log('Telegram notify failed:', notifyErr.message);
+    }
+
+    if (retryCount >= 2) {
+      return false;
+    }
+
     await page.waitForTimeout(2000);
-    return await checkZaraAvailability(product); // retry
+    return await checkZaraAvailability(product, retryCount + 1, browser, context); // retry
   } finally {
+  try {
+    if (!page.isClosed()) await page.close();
+  } catch {}
+
+  if (retryCount === 0) {
     await browser.close();
   }
 }
