@@ -5,9 +5,12 @@ import { sendTelegramNotification } from './notifier.js';
 
 const products = JSON.parse(fs.readFileSync('./products.json'));
 
+function loadProducts() {
+  return JSON.parse(fs.readFileSync('./products.json'));
+}
 
 async function runStockCheck() {
-
+const products = loadProducts();
 
  for (const product of products) {
   if (product.status !== 1) continue;
@@ -17,7 +20,7 @@ async function runStockCheck() {
   if (inStock) {
     await sendTelegramNotification(
       product.userId,
-      `✅ In stock!\nSize: ${product.size}\n${product.url}`
+       `🔥 IN STOCK!\nID: ${product.id}\nSize: ${product.size ?? 'ANY'}\n${product.url}`
     );
   }
 }

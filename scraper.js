@@ -6,12 +6,16 @@ export async function checkZaraAvailability(product) {
   headless: false,
   slowMo: 50,
   args: [
-    '--disable-blink-features=AutomationControlled'
+    '--window-position=-2000,0',   // 👈 ekranın kənarına atır
+    '--window-size=200,200',
+    '--disable-blink-features=AutomationControlled',
+    '--no-sandbox',
+    '--disable-dev-shm-usage'
   ]
 });
 
 const context = await browser.newContext({
-  viewport: { width: 1280, height: 800 },
+  viewport: { width: 200, height: 200 },
   locale: 'de-DE',
   timezoneId: 'Europe/Berlin',
   userAgent:
@@ -23,33 +27,46 @@ const context = await browser.newContext({
 
   const page = await context.newPage();
 
+  await page.evaluate(() => {
+  // pəncərəni ekrandan kənara at
+  window.moveTo(-4000, 0);
+  window.resizeTo(800, 600);
+
+  // fokus almasın
+  window.blur();
+});
+
   try {
     await page.goto(product.url, { waitUntil: 'domcontentloaded' });
 
     // 🔹 popup + cookie handling
     await handlePopupsAndCookies(page);
 
-    // 🔹 Add to cart button (sənin C# selector-un)
-    const addToCartSelector = 'button.product-detail-cart-buttons__button';
-    await page.waitForSelector(addToCartSelector, { timeout: 15000 });
+  
+
+   const addToCartSelector = 'button.product-detail-cart-buttons__button';
+ 
+   const inStock = await isInStockByButton(page);
+
+if (!inStock) {
+  return false;
+}
+
+    
+      
+     // 🔹 SIZE YOXDURSA → hər hansı stock varmı?
+    if (!product.size) {
+      
+      return true;
+    }
+    
 
     await page.click(addToCartSelector);
 
     // Bir az gözləyək ki size-lar render olunsun
     await page.waitForTimeout(1500);
 
-    // 🔹 SIZE YOXDURSA → hər hansı stock varmı?
-    if (!product.size) {
-      const inStock = await page.evaluate(() => {
-        return Array.from(
-          document.querySelectorAll(
-            'button.product-detail-size-selector-std-actions__button[data-qa-action="add-to-cart"]'
-          )
-        ).map(t => t.innerText.trim());
-      });
-
-      return inStock.length > 0;
-    }
+   
 
     // 🔹 ENABLED + IN STOCK
     const availableSizes = await page.evaluate(() => {
@@ -82,4 +99,22 @@ const context = await browser.newContext({
   } finally {
     await browser.close();
   }
+}
+
+async function isInStockByButton(page) {
+  const result = await page.evaluate(() => {
+    const btn = document.querySelector('button.product-detail-cart-buttons__button');
+    if (!btn) return false;
+
+    const action = btn.getAttribute('data-qa-action');
+    const text = btn.innerText.toLowerCase();
+
+    if (action === 'add-to-cart') return true;
+    if (action === 'show-similar-products') return false;
+    if (text.includes('out of stock')) return false;
+
+    return false;
+  });
+
+  return result;
 }

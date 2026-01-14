@@ -19,10 +19,10 @@ bot.on('message', msg => {
 });
 
 // 🟢 ADD
-bot.onText(/\/add (.+) (.+)/, (msg, match) => {
+bot.onText(/\/add (\S+)(?:\s+(\S+))?/, (msg, match) => {
   const chatId = msg.chat.id;
   const url = match[1];
-  const size = match[2];
+  const size = match[2] || null; // 👈 nullable
 
   const products = loadProducts();
   const id = products.length ? products[products.length - 1].id + 1 : 1;
@@ -39,7 +39,7 @@ bot.onText(/\/add (.+) (.+)/, (msg, match) => {
 
   bot.sendMessage(
     chatId,
-    `✅ Added\nID: ${id}\nSize: ${size}`
+    `✅ Added\nID: ${id}\nSize: ${size ?? 'ANY'}`
   );
 });
 
@@ -53,9 +53,15 @@ bot.onText(/\/list/, msg => {
     return;
   }
 
-  const text = products
-    .map(p => `ID:${p.id} | ${p.size} | status:${p.status}`)
-    .join('\n');
+ const text = products
+  .map(p =>
+    `ID: ${p.id}
+Size: ${p.size ?? 'ANY'}
+Status: ${p.status}
+Link: ${p.url}
+--------------------`
+  )
+  .join('\n');
 
   bot.sendMessage(chatId, text);
 });
