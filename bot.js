@@ -1,7 +1,8 @@
 import TelegramBot from 'node-telegram-bot-api';
 import fs from 'fs';
+import 'dotenv/config';
 
-const TOKEN = '7552377314:AAHpfHIsoTM4p3Iv5dhAEBt0E5WmWtnWeAk';
+const TOKEN = process.env.BOT_TOKEN;
 const PRODUCTS_FILE = './products.json';
 
 const bot = new TelegramBot(TOKEN, { polling: true });
@@ -14,115 +15,136 @@ function saveProducts(products) {
   fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
 }
 
-bot.on('message', msg => {
-  console.log('📩 MESSAGE RECEIVED:', msg.text);
-});
-
-// 🟢 ADD
-bot.onText(/\/add (\S+)(?:\s+(\S+))?/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const url = match[1];
-  const size = match[2] || null; // 👈 nullable
-
-  const products = loadProducts();
-  const id = products.length ? products[products.length - 1].id + 1 : 1;
-
-  products.push({
-    id,
-    userId: chatId,
-    url,
-    size,
-    status: 1
+function sendMenu(chatId) {
+  bot.sendMessage(chatId, '📋 Menyu', {
+    reply_markup: {
+      keyboard: [
+        ['➕ Məhsul əlavə et'],
+        ['📋 Məhsullarım'],
+        ['⏸️ Pause məhsul', '▶️ Resume məhsul'],
+        ['❌ Məhsul sil']
+      ],
+      resize_keyboard: true
+    }
   });
+}
 
-  saveProducts(products);
+const userStates = {};
 
-  bot.sendMessage(
-    chatId,
-    `✅ Added\nID: ${id}\nSize: ${size ?? 'ANY'}`
-  );
+// /start
+bot.onText(/\/start/, msg => {
+  sendMenu(msg.chat.id);
 });
 
-// 📋 LIST
-bot.onText(/\/list/, msg => {
+// Main message handler
+bot.on('message', msg => {
   const chatId = msg.chat.id;
-  const products = loadProducts().filter(p => p.userId === chatId);
+  const text = msg.text;
 
-  if (!products.length) {
-    bot.sendMessage(chatId, 'No products.');
+  if (!text) return;
+
+  // ADD PRODUCT FLOW
+  if (text === '➕ Məhsul əlavə et') {
+    userStates[chatId] = { step: 'await_url' };
+    bot.sendMessage(chatId, '🔗 Zara linkini göndər:');
     return;
   }
 
- const text = products
-  .map(p =>
-    `ID: ${p.id}
-Size: ${p.size ?? 'ANY'}
-Status: ${p.status}
-Link: ${p.url}
---------------------`
-  )
-  .join('\n');
-
-  bot.sendMessage(chatId, text);
-});
-
-// ⏸️ PAUSE
-bot.onText(/\/pause (\d+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const id = Number(match[1]);
-
-  const products = loadProducts();
-  const product = products.find(p => p.id === id && p.userId === chatId);
-
-  if (!product) {
-    bot.sendMessage(chatId, '❌ Not found');
+  if (userStates[chatId]?.step === 'await_url') {
+    userStates[chatId].url = text;
+    userStates[chatId].step = 'await_size';
+    bot.sendMessage(chatId, '📏 Ölçünü yaz (məs: M, L, 42):');
     return;
   }
 
-  product.status = 0;
-  saveProducts(products);
+  if (userStates[chatId]?.step === 'await_size') {
+    const url = userStates[chatId].url;
+    const size = text;
 
-  bot.sendMessage(chatId, `⏸️ Paused ID ${id}`);
-});
+    const products = loadProducts();
+    const id = products.length ? products[products.length - 1].id + 1 : 1;
 
-// ▶️ RESUME
-bot.onText(/\/resume (\d+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const id = Number(match[1]);
+    products.push({
+      id,
+      userId: chatId,
+      url,
+      size,
+      status: 1,
+      price: 0
+    });
 
-  const products = loadProducts();
-  const product = products.find(p => p.id === id && p.userId === chatId);
+    saveProducts(products);
 
-  if (!product) {
-    bot.sendMessage(chatId, '❌ Not found');
+    bot.sendMessage(chatId, `✅ Əlavə olundu\nID: ${id}\nSize: ${size}`);
+    sendMenu(chatId);
+
+    delete userStates[chatId];
     return;
   }
 
-  product.status = 1;
-  saveProducts(products);
+  // LIST PRODUCTS
+  if (text === '📋 Məhsullarım') {
+    const products = loadProducts().filter(p => p.userId === chatId);
 
-  bot.sendMessage(chatId, `▶️ Resumed ID ${id}`);
-});
+    if (!products.length) {
+      bot.sendMessage(chatId, 'Heç bir məhsul yoxdur.');
+      return;
+    }
 
-// ❌ REMOVE
-bot.onText(/\/remove (\d+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const id = Number(match[1]);
+    const list = products
+      .map(p => `ID:${p.id} | Size:${p.size} | Status:${p.status ? 'ON' : 'OFF'}`)
+      .join('\n');
 
-  let products = loadProducts();
-  const before = products.length;
-
-  products = products.filter(
-    p => !(p.id === id && p.userId === chatId)
-  );
-
-  if (products.length === before) {
-    bot.sendMessage(chatId, '❌ Not found');
+    bot.sendMessage(chatId, list);
     return;
   }
 
-  saveProducts(products);
-  bot.sendMessage(chatId, `🗑️ Removed ID ${id}`);
+  // ACTION SELECT
+  if (text === '⏸️ Pause məhsul') {
+    userStates[chatId] = { action: 'pause' };
+    bot.sendMessage(chatId, 'Pause ediləcək ID-ni yaz:');
+    return;
+  }
+
+  if (text === '▶️ Resume məhsul') {
+    userStates[chatId] = { action: 'resume' };
+    bot.sendMessage(chatId, 'Resume ediləcək ID-ni yaz:');
+    return;
+  }
+
+  if (text === '❌ Məhsul sil') {
+    userStates[chatId] = { action: 'remove' };
+    bot.sendMessage(chatId, 'Silinəcək ID-ni yaz:');
+    return;
+  }
+
+  // HANDLE ID INPUT
+  if (userStates[chatId]?.action && /^\d+$/.test(text)) {
+    const id = Number(text);
+    let products = loadProducts();
+    const product = products.find(p => p.id === id && p.userId === chatId);
+
+    if (!product) {
+      bot.sendMessage(chatId, '❌ Tapılmadı');
+      delete userStates[chatId];
+      sendMenu(chatId);
+      return;
+    }
+
+    if (userStates[chatId].action === 'pause') product.status = 0;
+    if (userStates[chatId].action === 'resume') product.status = 1;
+
+    if (userStates[chatId].action === 'remove') {
+      products = products.filter(p => !(p.id === id && p.userId === chatId));
+    }
+
+    saveProducts(products);
+
+    bot.sendMessage(chatId, '✅ Əməliyyat tamamlandı');
+    sendMenu(chatId);
+    delete userStates[chatId];
+    return;
+  }
 });
 
-console.log('🤖 Telegram bot running');
+console.log('🤖 Telegram menu bot işləyir...');
