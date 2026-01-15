@@ -134,5 +134,13 @@
     "size": "XS",
     "status": 1,
     "price": 19.99
+  },
+  {
+    "id": 23,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/knit-jumper-with-contrast-trims-p05536171.html?v1=463535911&useHighContrastImages=true",
+    "size": "Any",
+    "status": 1,
+    "price": 0
   }
 ]

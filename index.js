@@ -43,7 +43,7 @@ const products = loadProducts();
     );
 
   await Promise.all(tasks);
-
+  }
   fs.writeFileSync('./products.json', JSON.stringify(products, null, 2));
 }
 

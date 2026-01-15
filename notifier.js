@@ -1,8 +1,9 @@
 import axios from 'axios';
+import 'dotenv/config';
 
-
-const AUTHOR_CHAT_ID='1279780050';
+const AUTHOR_CHAT_ID=process.env.BOT_AUTHOR_CHAT_ID;
 const TOKEN = process.env.BOT_TOKEN;
+
 
 export async function sendTelegramNotification(chatId, message) {
   await axios.post(
