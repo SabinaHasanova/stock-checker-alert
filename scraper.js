@@ -25,13 +25,7 @@ export async function checkZaraAvailability(product, retryCount = 0, browser = n
   }
 
   const page = await context.newPage();
-  await page.evaluate(() => {
-    // pəncərəni ekrandan kənara at
-    window.moveTo(-4000, 0);
-    window.resizeTo(800, 600);
-
-
-  });
+ 
 
   try {
     await page.goto(product.url, {waitUntil: 'domcontentloaded'});
@@ -55,40 +49,40 @@ const currentPrice = await page.evaluate(() => {
 
     if (currentPrice && product.price !== undefined && currentPrice !== product.price) {
 
-      const diff = currentPrice - product.price;
-      const direction = diff < 0 ? '📉 Price dropped' : '📈 Price increased';
-
-      await sendTelegramNotification(
+      const diff = currentPrice - product.price;   
+      if(diff < 0)
+        {
+           await sendTelegramNotification(
           product.userId,
-          `${direction}\nOld: ${product.price} \nNew: ${currentPrice} \n${product.url}`
-      );
+          `📉 Price dropped \nOld: ${product.price} \nNew: ${currentPrice} \n${product.url}`
+          );
 
+      }
+     
       product.price = currentPrice; // listdə yenilə
 
     }
 
 
-    const addToCartSelector = 'button.product-detail-cart-buttons__button';
+     // -------- Stock by button --------
 
     const inStock = await isInStockByButton(page);
 
-    if (!inStock) {
-      return false;
-    }
-
-    // 🔹 SIZE YOXDURSA → hər hansı stock varmı?
-    if (!product.size) {
-
-      return true;
-    }
-
-
-    await page.click(addToCartSelector);
-
-    // Bir az gözləyək ki size-lar render olunsun
-
+    if (!inStock) return false;
     
 
+    // -------- If no size required --------
+    if (!product.size) return true;
+    
+
+   
+     // -------- Safe click add-to-cart --------
+    await safeClickAddToCart(page);
+    
+    await page.waitForSelector(
+     'li.size-selector-sizes-size--enabled',
+        { timeout: 3000 }
+      );
     // 🔹 ENABLED + IN STOCK
     const availableSizes = await page.evaluate(() => {
       return Array.from(
@@ -156,4 +150,25 @@ async function isInStockByButton(page) {
   });
 
   return result;
+}
+
+
+async function safeClickAddToCart(page, retries = 3) {
+  const ADD_BTN = 'button.product-detail-cart-buttons__button';
+  for (let i = 0; i < retries; i++) {
+    try {
+      await page.waitForSelector(ADD_BTN, { state: 'visible', timeout: 5000 });
+
+      await page.evaluate(sel => {
+        const btn = document.querySelector(sel);
+        if (!btn) throw new Error('Add to cart button missing');
+        btn.click();
+      }, ADD_BTN);
+
+      return true;
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await page.waitForTimeout(1200);
+    }
+  }
 }
