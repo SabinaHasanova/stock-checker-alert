@@ -167,6 +167,14 @@ export function getCheckLogs(productId, limit = 10) {
   }
 }
 
+export function closeDB() {
+  try {
+    db.close();
+  } catch (err) {
+    console.error('Error closing DB:', err.message);
+  }
+}
+
 export function addProduct(p) {
   const stmt = db.prepare('INSERT INTO products (user_id, url, size, status, price) VALUES (?, ?, ?, ?, ?)');
   const info = stmt.run(p.userId, p.url, p.size, p.status ?? 1, p.price ?? 0);

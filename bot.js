@@ -3,14 +3,40 @@ import fs from 'fs';
 import path from 'path';
 import { getStores, getProductsByUserAndStatus, addProduct, getProductsByUser, updateProduct, deleteProduct, getCheckLogs } from './db.js';
 import 'dotenv/config';
-import Database from 'better-sqlite3';
 
 const TOKEN = process.env.BOT_TOKEN;
 const PRODUCTS_FILE = path.resolve(process.cwd(), 'products.json');
-const db = new Database('data/db.sqlite');
 
-const bot = new TelegramBot(TOKEN, { polling: true });
+// If BOT_TOKEN is not configured, provide a no-op bot implementation
+// so the rest of the code can run without throwing. This allows
+// running scrapers locally without enabling notifications.
+let bot;
+if (TOKEN) {
+  bot = new TelegramBot(TOKEN, { polling: true });
+} else {
+  console.warn('BOT_TOKEN not set — Telegram bot disabled.');
+  bot = {
+    sendMessage: async (chatId, text, opts) => console.warn('Bot disabled — would send to', chatId, text),
+    on: () => {},
+    onText: () => {},
+    answerCallbackQuery: async () => {},
+    removeAllListeners: () => {}
+  };
+}
+
 const userStates = {};
+
+function truncateUrl(u, maxLen = 40) {
+  try {
+    const url = new URL(u);
+    const s = `${url.hostname}${url.pathname}`;
+    if (s.length <= maxLen) return s;
+    return s.slice(0, maxLen - 3) + '...';
+  } catch (err) {
+    if (!u) return '';
+    return u.length > maxLen ? u.slice(0, maxLen - 3) + '...' : u;
+  }
+}
 
 /* =======================
    Storage helpers
@@ -110,7 +136,10 @@ function sendProductsMenu(chatId) {
 */
 
 function sendSizeMenu(chatId) {
-  bot.sendMessage(chatId, 'Enter size or choose Skip:', {
+  const url = userStates[chatId] && userStates[chatId].url ? userStates[chatId].url : null;
+  const prompt = url ? `Link: ${url}\n\nEnter size or choose Skip:` : 'Enter size or choose Skip:';
+
+  bot.sendMessage(chatId, prompt, {
     reply_markup: {
       keyboard: [['Skip']],
       resize_keyboard: true,
@@ -168,11 +197,18 @@ bot.on('message', msg => {
   /* ---------- Store selection ---------- */
 
   if (state.step === 'select_store') {
-    if (text === 'Zara') {
-      setState(chatId, { store: 'zara', step: null });
-      bot.sendMessage(chatId, '✅ Zara selected');
-      sendMainMenu(chatId);
-    } else {
+    // Fallback: allow typing store name (case-insensitive) to select it
+    try {
+      const stores = loadStores();
+      const found = stores.find(s => s.name.toLowerCase() === String(text).toLowerCase());
+      if (found) {
+        setState(chatId, { store: found.slug, step: null });
+        bot.sendMessage(chatId, `✅ ${found.name} selected`);
+        sendMainMenu(chatId);
+      } else {
+        bot.sendMessage(chatId, 'Please select a store from the list.');
+      }
+    } catch (err) {
       bot.sendMessage(chatId, 'Please select a store from the list.');
     }
     return;
@@ -303,9 +339,12 @@ function showProducts(chatId, status) {
     return;
   }
 
-  // Build inline keyboard: one row per product, plus a Back button
+  // Build inline keyboard: show ID plus extra info (size, short url, price)
   const keyboard = products.map(p => [
-    { text: `ID:${p.id} | ${p.size ?? 'N/A'}`, callback_data: `product_${p.id}` }
+    {
+      text: `${p.id} • ${p.size ?? 'N/A'} • ${truncateUrl(p.url, 36)}${p.price ? ' • ' + p.price : ''}`,
+      callback_data: `product_${p.id}`
+    }
   ]);
 
   keyboard.push([{ text: '⬅ Back to menu', callback_data: 'back_to_menu' }]);
@@ -332,6 +371,23 @@ bot.on('callback_query', async query => {
   if (data === 'main_add_product') {
     setState(chatId, { step: 'await_url' });
     bot.sendMessage(chatId, '🔗 Send product link:');
+    return;
+  }
+
+  // Store selection via inline buttons (callback_data = store_<slug>)
+  if (data && data.startsWith('store_')) {
+    const slug = data.split('_')[1];
+    try {
+      const stores = loadStores();
+      const store = stores.find(s => s.slug === slug) || { slug };
+      setState(chatId, { store: store.slug, step: null });
+      bot.sendMessage(chatId, `✅ ${store.name ?? store.slug} selected`);
+      sendMainMenu(chatId);
+    } catch (err) {
+      setState(chatId, { store: slug, step: null });
+      bot.sendMessage(chatId, `✅ ${slug} selected`);
+      sendMainMenu(chatId);
+    }
     return;
   }
 
@@ -379,23 +435,21 @@ bot.on('callback_query', async query => {
     actions.push({ text: '❌ Delete', callback_data: `action_delete_${id}` });
     actions.push({ text: '⬅ Back', callback_data: 'back_to_menu' });
 
-    await bot.sendMessage(chatId,
-      `ID:${product.id}\nUrl:${product.url}\nSize:${product.size ?? 'N/A'}\nStatus:${product.status === 1 ? 'Active' : 'Paused'}`,
-      { reply_markup: { inline_keyboard: [actions] } }
-    );
+    const detailText = `ID:${product.id}\nSize:${product.size ?? 'N/A'}\nStatus:${product.status === 1 ? 'Active' : 'Paused'}\nPrice:${product.price ?? 'N/A'}\n\n<a href="${product.url}">Open product</a>`;
+    await bot.sendMessage(chatId, detailText, { reply_markup: { inline_keyboard: [actions] }, parse_mode: 'HTML' });
     return;
   }
 
   if (data && data.startsWith('action_toggle_')) {
     const id = Number(data.split('_')[2]);
-    const products = loadProducts();
-    const idx = products.findIndex(p => p.id === id);
-    if (idx === -1) {
+    const products = getProductsByUser(chatId);
+    const product = products.find(p => p.id === id);
+    if (!product) {
       bot.sendMessage(chatId, 'Product not found.');
       return;
     }
-    products[idx].status = products[idx].status === 1 ? 0 : 1;
-    saveProducts(products);
+    product.status = product.status === 1 ? 0 : 1;
+    try { updateProduct(product); } catch (err) { console.error('updateProduct error:', err.message); }
     bot.sendMessage(chatId, '✅ Operation completed');
     sendMainMenu(chatId);
     return;
@@ -437,15 +491,13 @@ bot.on('callback_query', async query => {
 
   if (data && data.startsWith('confirm_delete_')) {
     const id = Number(data.split('_')[2]);
-    let products = loadProducts();
-    const before = products.length;
-    products = products.filter(p => p.id !== id);
-    if (products.length === before) {
+    try {
+      deleteProduct(id);
+      bot.sendMessage(chatId, '✅ Product deleted');
+    } catch (err) {
+      console.error('deleteProduct error:', err.message);
       bot.sendMessage(chatId, 'Product not found.');
-      return;
     }
-    saveProducts(products);
-    bot.sendMessage(chatId, '✅ Product deleted');
     sendMainMenu(chatId);
     return;
   }

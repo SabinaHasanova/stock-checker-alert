@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 import { checkZaraAvailability } from './scraper.js';
 import { sendTelegramNotification,sendTelegramErrorNotification  } from './notifier.js';
 import pLimit from 'p-limit';
-import { getProductsForCheck, addCheckLog } from './db.js';
+import { getProductsForCheck, addCheckLog, closeDB } from './db.js';
 
 const limit = pLimit(3);
 
@@ -93,6 +93,36 @@ function validateEnv() {
 
 await runStockCheck();
 
-cron.schedule('*/5 * * * *', async () => {
+validateEnv();
+
+const scheduledTask = cron.schedule('*/5 * * * *', async () => {
   await runStockCheck();
+});
+
+async function gracefulShutdown(signal) {
+  try {
+    console.log('Shutting down (signal:', signal, ')');
+    try { if (scheduledTask) scheduledTask.stop(); } catch (err) {}
+    try { closeDB(); } catch (err) { console.error('Error closing DB during shutdown:', err.message); }
+    console.log('Shutdown complete.');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error during shutdown:', err.message);
+    process.exit(1);
+  }
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+process.on('uncaughtException', async (err) => {
+  console.error('Uncaught exception:', err && err.stack ? err.stack : err);
+  try { await sendTelegramErrorNotification(`Uncaught exception: ${err && err.message ? err.message : String(err)}`); } catch (e) {}
+  try { closeDB(); } catch (e) {}
+  process.exit(1);
+});
+
+process.on('unhandledRejection', async (reason) => {
+  console.error('Unhandled rejection:', reason);
+  try { await sendTelegramErrorNotification(`Unhandled rejection: ${String(reason)}`); } catch (e) {}
 });
