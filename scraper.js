@@ -14,7 +14,7 @@ export async function checkZaraAvailability(product, retryCount = 0, browser = n
     });
 
      context = await browser.newContext({
-      viewport: {width: 200, height: 200},
+      viewport: {width: 800, height: 800},
       locale: 'de-DE',
       timezoneId: 'Europe/Berlin',
       userAgent:
@@ -75,14 +75,14 @@ const currentPrice = await page.evaluate(() => {
     if (!product.size) return true;
     
 
-   
-     // -------- Safe click add-to-cart --------
-    await safeClickAddToCart(page);
-    
-    await page.waitForSelector(
-     'li.size-selector-sizes-size--enabled',
-        { timeout: 3000 }
-      );
+      // 🔹 Add to cart button (sənin C# selector-un)
+    const addToCartSelector = 'button.product-detail-cart-buttons__button';
+    await page.waitForSelector(addToCartSelector, { timeout: 15000 });
+
+    await page.click(addToCartSelector);
+
+    // Bir az gözləyək ki size-lar render olunsun
+    await page.waitForTimeout(1500);
     // 🔹 ENABLED + IN STOCK
     const availableSizes = await page.evaluate(() => {
       return Array.from(

@@ -142,7 +142,6 @@ bot.on('message', msg => {
     products.push({
       id,
       userId: chatId,
-      store: state.store,
       url: state.url,
       size,
       status: 1,
@@ -153,7 +152,7 @@ bot.on('message', msg => {
 
     bot.sendMessage(
       chatId,
-      `✅ Added successfully\nStore: ${state.store}\nID: ${id}\nSize: ${size ?? 'N/A'}`
+      `✅ Added successfully\nUrl: ${state.url}\nID: ${id}\nSize: ${size ?? 'N/A'}`
     );
 
     resetStep(chatId);
@@ -246,7 +245,7 @@ function showProducts(chatId, status) {
   }
 
   const list = products
-    .map(p => `ID:${p.id} | Store:${p.store} | Size:${p.size ?? 'N/A'}`)
+    .map(p => `ID:${p.id} | Url:${p.url} | Size:${p.size ?? 'N/A'}`)
     .join('\n');
 
   bot.sendMessage(chatId, list);

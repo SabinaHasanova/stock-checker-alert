@@ -8,6 +8,22 @@
     "price": 0
   },
   {
+    "id": 32,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/diamond-knit-cardigan-with-belt-p02756122.html?v1=466704790&useHighContrastImages=true",
+    "size": "M",
+    "status": 0,
+    "price": 0
+  },
+  {
+    "id": 33,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/ribbed-midi-skirt-p02756123.html?v1=466704789&useHighContrastImages=true",
+    "size": "M",
+    "status": 0,
+    "price": 0
+  },
+  {
     "id": 3,
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128&useHighContrastImages=true",
@@ -32,14 +48,6 @@
     "price": 0
   },
   {
-    "id": 6,
-    "userId": 1279780050,
-    "url": "https://www.zara.com/de/en/knit-jumper-with-contrast-trims-p05536171.html?v1=463535911&useHighContrastImages=true",
-    "size": "XS",
-    "status": 1,
-    "price": 9.99
-  },
-  {
     "id": 7,
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/ribbed-midi-skirt-p02756123.html?v1=466704789&useHighContrastImages=true",
@@ -54,14 +62,6 @@
     "size": "M",
     "status": 0,
     "price": 0
-  },
-  {
-    "id": 9,
-    "userId": 1279780050,
-    "url": "https://www.zara.com/de/de/kurzes-kleid-mit-zierfalten-und-taschen-p08839777.html?v1=497753423&origin=shopcart",
-    "size": "S",
-    "status": 1,
-    "price": 12.99
   },
   {
     "id": 10,
@@ -92,7 +92,7 @@
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/poplin-shirt-with-buttons-p08382593.html?v1=490754812",
     "size": "XS",
-    "status": 1,
+    "status": 0,
     "price": 9.99
   },
   {
@@ -138,9 +138,49 @@
   {
     "id": 23,
     "userId": 1279780050,
-    "url": "https://www.zara.com/de/en/knit-jumper-with-contrast-trims-p05536171.html?v1=463535911&useHighContrastImages=true",
-    "size": "Any",
+    "url": "https://www.zara.com/de/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
+    "size": "XS",
     "status": 1,
-    "price": 0
+    "price": 19.99
+  },
+  {
+    "id": 24,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
+    "size": "S",
+    "status": 1,
+    "price": 19.99
+  },
+  {
+    "id": 25,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
+    "size": "XS",
+    "status": 1,
+    "price": 17.99
+  },
+  {
+    "id": 26,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
+    "size": "S",
+    "status": 1,
+    "price": 17.99
+  },
+  {
+    "id": 27,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128&useHighContrastImages=true",
+    "size": "S",
+    "status": 1,
+    "price": 12.99
+  },
+  {
+    "id": 28,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/water-repellent-hooded-quilted-anorak-p04749822.html?v1=498003571&useHighContrastImages=true",
+    "size": "XS",
+    "status": 1,
+    "price": 12.99
   }
 ]
