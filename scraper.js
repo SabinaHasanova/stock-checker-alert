@@ -4,24 +4,40 @@ import { sendTelegramErrorNotification,sendTelegramNotification  } from './notif
 
 
 
+/*
+  checkZaraAvailability(product, retryCount, browser, context)
+  - Visits a Zara product page and inspects price and availability.
+  - Parameters:
+    - product: object containing `url`, `size`, `price`, `userId`, etc.
+    - retryCount: current retry attempt (used internally).
+    - browser: optional Playwright Browser to reuse across checks.
+    - context: optional Playwright BrowserContext to reuse across checks.
+  - Returns: `true` if the requested size is available, `false` otherwise.
+*/
 export async function checkZaraAvailability(product, retryCount = 0, browser = null, context = null) {
+
+  let createdBrowser = false;
+  let createdContext = false;
 
   if (!browser) {
     browser = await chromium.launch({
       headless: false,
-      slowMo: 50,
       args: ['--disable-blink-features=AutomationControlled']
     });
+    createdBrowser = true;
+  }
 
-     context = await browser.newContext({
-      viewport: {width: 800, height: 800},
+  if (!context) {
+    context = await browser.newContext({
+      viewport: { width: 800, height: 800 },
       locale: 'de-DE',
       timezoneId: 'Europe/Berlin',
       userAgent:
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-          'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-          'Chrome/120.0.0.0 Safari/537.36'
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+        'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+        'Chrome/120.0.0.0 Safari/537.36'
     });
+    createdContext = true;
   }
 
   const page = await context.newPage();
@@ -129,12 +145,21 @@ const currentPrice = await page.evaluate(() => {
     } catch {
     }
 
-    if (retryCount === 0) {
-      await browser.close();
-    }
+    try {
+      if (createdContext && context && !context.isClosed?.()) await context.close();
+    } catch {}
+
+    try {
+      if (createdBrowser && browser) await browser.close();
+    } catch {}
   }
 }
 async function isInStockByButton(page) {
+  /*
+    isInStockByButton(page)
+    - Inspect the primary add-to-cart button to infer whether the product
+      is available to add to cart. Returns boolean.
+  */
   const result = await page.evaluate(() => {
     const btn = document.querySelector('button.product-detail-cart-buttons__button');
     if (!btn) return false;
@@ -154,6 +179,11 @@ async function isInStockByButton(page) {
 
 
 async function safeClickAddToCart(page, retries = 3) {
+  /*
+    safeClickAddToCart(page, retries)
+    - Attempt to click the add-to-cart button with a small retry loop.
+    - Throws if the button cannot be clicked after `retries` attempts.
+  */
   const ADD_BTN = 'button.product-detail-cart-buttons__button';
   for (let i = 0; i < retries; i++) {
     try {

@@ -1,9 +1,10 @@
 import TelegramBot from 'node-telegram-bot-api';
 import fs from 'fs';
+import path from 'path';
 import 'dotenv/config';
 
 const TOKEN = process.env.BOT_TOKEN;
-const PRODUCTS_FILE = './products.json';
+const PRODUCTS_FILE = path.resolve(process.cwd(), 'products.json');
 
 const bot = new TelegramBot(TOKEN, { polling: true });
 const userStates = {};
@@ -13,12 +14,27 @@ const userStates = {};
 ======================= */
 
 function loadProducts() {
-  if (!fs.existsSync(PRODUCTS_FILE)) fs.writeFileSync(PRODUCTS_FILE, '[]');
-  return JSON.parse(fs.readFileSync(PRODUCTS_FILE));
+  try {
+    if (!fs.existsSync(PRODUCTS_FILE)) fs.writeFileSync(PRODUCTS_FILE, '[]');
+    const data = fs.readFileSync(PRODUCTS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (err) {
+    console.error('Failed to load products file:', err.message);
+    return [];
+  }
 }
 
+/*
+  sendStoreMenu(chatId)
+  - Sends the initial store selection keyboard to the user.
+*/
+
 function saveProducts(products) {
-  fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
+  try {
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
+  } catch (err) {
+    console.error('Failed to save products file:', err.message);
+  }
 }
 
 /* =======================
@@ -34,6 +50,11 @@ function sendStoreMenu(chatId) {
   });
 }
 
+/*
+  sendMainMenu(chatId)
+  - Sends the main action keyboard (add/list/pause/resume/delete).
+*/
+
 function sendMainMenu(chatId) {
   bot.sendMessage(chatId, '📋 Menu', {
     reply_markup: {
@@ -48,6 +69,11 @@ function sendMainMenu(chatId) {
   });
 }
 
+/*
+  sendProductsMenu(chatId)
+  - Sends a keyboard to choose between active/paused products.
+*/
+
 function sendProductsMenu(chatId) {
   bot.sendMessage(chatId, 'Select product type:', {
     reply_markup: {
@@ -60,6 +86,11 @@ function sendProductsMenu(chatId) {
     }
   });
 }
+
+/*
+  sendSizeMenu(chatId)
+  - Asks the user for a size or allows skipping (one-time keyboard).
+*/
 
 function sendSizeMenu(chatId) {
   bot.sendMessage(chatId, 'Enter size or choose Skip:', {
@@ -78,6 +109,11 @@ function sendSizeMenu(chatId) {
 function setState(chatId, data) {
   userStates[chatId] = { ...(userStates[chatId] || {}), ...data };
 }
+
+/*
+  resetStep(chatId)
+  - Reset in-memory conversation step/action for a user.
+*/
 
 function resetStep(chatId) {
   if (userStates[chatId]) {
@@ -205,6 +241,12 @@ function askForAction(chatId, action) {
   bot.sendMessage(chatId, 'Enter product ID:');
 }
 
+/*
+  handleProductAction(chatId, id)
+  - Perform the requested action (pause/resume/remove) on a product
+    owned by the requesting user. Sends confirmation messages.
+*/
+
 function handleProductAction(chatId, id) {
   const state = userStates[chatId];
   let products = loadProducts();
@@ -229,6 +271,12 @@ function handleProductAction(chatId, id) {
   resetStep(chatId);
   sendMainMenu(chatId);
 }
+
+/*
+  showProducts(chatId, status)
+  - Sends a list of products for the given `status` (1 active, 0 paused)
+    that belong to the requesting user.
+*/
 
 /* =======================
    Product listing
