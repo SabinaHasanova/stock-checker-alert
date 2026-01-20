@@ -1,22 +1,15 @@
 import 'dotenv/config';
-import fs from 'fs';
 import cron from 'node-cron';
 import { chromium } from 'playwright';
 import { checkZaraAvailability } from './scraper.js';
 import { sendTelegramNotification,sendTelegramErrorNotification  } from './notifier.js';
 import pLimit from 'p-limit';
+import { getProductsForCheck, addCheckLog } from './db.js';
 
 const limit = pLimit(3);
 
 
-/*
-  loadProducts()
-  - Read and parse the `products.json` file from disk.
-  - Returns an array of product objects (or throws if file is invalid).
-*/
-function loadProducts() {
-  return JSON.parse(fs.readFileSync('./products.json'));
-}
+// products are now stored in SQLite; see `db.js` helpers.
 
 /*
   runStockCheck()
@@ -26,11 +19,8 @@ function loadProducts() {
     and persists updated product state back to disk.
 */
 async function runStockCheck() {
-  const products = loadProducts();
-
-  const activeProducts = products.filter(product => product.status === 1);
+  const activeProducts = getProductsForCheck();
   if (!activeProducts.length) {
-    fs.writeFileSync('./products.json', JSON.stringify(products, null, 2));
     return;
   }
 
@@ -56,6 +46,8 @@ async function runStockCheck() {
       limit(async () => {
         try {
           const inStock = await checkZaraAvailability(product, 0, browser, context);
+          // Log the check result
+          try { addCheckLog({ productId: product.id, inStock: inStock ? 1 : 0, price: product.price ?? null }); } catch {}
 
           if (inStock) {
             await sendTelegramNotification(
@@ -67,9 +59,9 @@ async function runStockCheck() {
         } catch (err) {
           console.log('Global stock check error:', err.message);
 
-          await sendTelegramErrorNotification(
-            `❌ Stock checker crashed\nError: ${err.message}`
-          );
+          try { addCheckLog({ productId: product.id, inStock: 0, price: product.price ?? null, error: err.message }); } catch {}
+
+          await sendTelegramErrorNotification(`❌ Stock checker crashed\nError: ${err.message}`);
         }
       })
     );
@@ -78,7 +70,6 @@ async function runStockCheck() {
   } finally {
     try { if (context) await context.close(); } catch {}
     try { if (browser) await browser.close(); } catch {}
-    fs.writeFileSync('./products.json', JSON.stringify(products, null, 2));
   }
 }
 

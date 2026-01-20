@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 import { handlePopupsAndCookies } from './handlePopupsAndCookies.js';
 import { sendTelegramErrorNotification,sendTelegramNotification  } from './notifier.js';
+import { updateProduct } from './db.js';
 
 
 
@@ -76,6 +77,11 @@ const currentPrice = await page.evaluate(() => {
       }
      
       product.price = currentPrice; // listdə yenilə
+      try {
+        if (product.id) updateProduct(product);
+      } catch (e) {
+        console.error('Failed to update product price in DB:', e.message);
+      }
 
     }
 
