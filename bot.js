@@ -173,6 +173,27 @@ bot.on('message', msg => {
   if (state.step === 'await_size') {
     const size = text === 'Skip' ? null : text.trim();
     const products = loadProducts();
+
+    // ✅ DUPLICATE CHECK (same user + same url + same size)
+  const normalizedUrl = (state.url || '').trim();
+  const normalizedSize = (size || '').trim().toLowerCase(); // null olarsa ""
+
+  const alreadyExists = products.some(p => {
+    if (p.userId !== chatId) return false;
+
+    const pUrl = (p.url || '').trim();
+    const pSize = (p.size || '').trim().toLowerCase();
+
+    // eyni url + eyni size (ikisi də null ola bilər)
+    return pUrl === normalizedUrl && pSize === normalizedSize;
+  });
+
+  if (alreadyExists) {
+    bot.sendMessage(chatId, `⚠️ This product is already added.\nUrl: ${normalizedUrl}\nSize: ${size ?? 'N/A'}`);
+    resetStep(chatId);
+    sendMainMenu(chatId);
+    return;
+  }
     const id = products.length ? products.at(-1).id + 1 : 1;
 
     products.push({

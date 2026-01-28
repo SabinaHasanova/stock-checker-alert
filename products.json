@@ -29,7 +29,7 @@
     "url": "https://www.zara.com/de/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128&useHighContrastImages=true",
     "size": "S",
     "status": 1,
-    "price": 12.99
+    "price": 9.99
   },
   {
     "id": 4,
@@ -37,7 +37,7 @@
     "url": "https://www.zara.com/de/en/cardigan-with-contrast-trims-p05536196.html?v1=465581326&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
-    "price": 9.99
+    "price": 7.99
   },
   {
     "id": 5,
@@ -53,7 +53,7 @@
     "url": "https://www.zara.com/de/en/ribbed-midi-skirt-p02756123.html?v1=466704789&useHighContrastImages=true",
     "size": "M",
     "status": 1,
-    "price": 7.99
+    "price": 5.99
   },
   {
     "id": 8,
@@ -104,36 +104,20 @@
     "price": 0
   },
   {
-    "id": 19,
-    "userId": 1279780050,
-    "url": "https://www.zara.com/de/en/zw-collection-limited-edition-short-dress-with-pockets-p09216085.html?v1=485791304",
-    "size": "XS",
-    "status": 1,
-    "price": 12.99
-  },
-  {
     "id": 20,
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/herringbone-balloon-bomber-jacket-p09385744.html?v1=487784704",
     "size": "XS",
-    "status": 1,
-    "price": 19.99
+    "status": 0,
+    "price": 12.99
   },
   {
     "id": 21,
     "userId": 1279780050,
     "url": "https://www.zara.com/uk/en/herringbone-balloon-bomber-jacket-p09385744.html?v1=487784704",
     "size": "XS",
-    "status": 1,
-    "price": 16.79
-  },
-  {
-    "id": 22,
-    "userId": 1279780050,
-    "url": "https://www.zara.com/de/en/zw-collection-short-padded-anorak-with-ties-p03833249.html?v1=469040330",
-    "size": "XS",
-    "status": 1,
-    "price": 19.99
+    "status": 0,
+    "price": 11.19
   },
   {
     "id": 23,
@@ -141,7 +125,7 @@
     "url": "https://www.zara.com/de/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
-    "price": 19.99
+    "price": 12.99
   },
   {
     "id": 24,
@@ -149,7 +133,7 @@
     "url": "https://www.zara.com/de/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "S",
     "status": 1,
-    "price": 19.99
+    "price": 12.99
   },
   {
     "id": 25,
@@ -157,7 +141,7 @@
     "url": "https://www.zara.com/uk/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
-    "price": 17.99
+    "price": 11.99
   },
   {
     "id": 26,
@@ -165,14 +149,14 @@
     "url": "https://www.zara.com/uk/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "S",
     "status": 1,
-    "price": 17.99
+    "price": 11.99
   },
   {
     "id": 27,
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128&useHighContrastImages=true",
     "size": "S",
-    "status": 1,
+    "status": 0,
     "price": 12.99
   },
   {
@@ -181,14 +165,206 @@
     "url": "https://www.zara.com/de/en/water-repellent-hooded-quilted-anorak-p04749822.html?v1=498003571&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
-    "price": 12.99
+    "price": 9.99
   },
   {
     "id": 29,
     "userId": 1279780050,
-    "url": "https://www.zara.com/uk/en/linen-blend-midi-skirt-with-belt-p08116734.html?v1=477258549",
+    "url": "https://www.zara.com/de/de/midirock-mit-gurtel-aus-leinen-p08116734.html?v1=477258549",
+    "size": "XS",
+    "status": 1,
+    "price": 9.99
+  },
+  {
+    "id": 30,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/de/strickjacke-mit-rautenmuster-und-gurtel-p02756122.html?v1=466704790",
+    "size": "M",
+    "status": 1,
+    "price": 12.99
+  },
+  {
+    "id": 31,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/zw-collection-oxford-shirt-p04043253.html?v1=493659739",
+    "size": "XS",
+    "status": 1,
+    "price": 7.99
+  },
+  {
+    "id": 32,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/boat-neck-t-shirt-p00264456.html?v1=469502086",
+    "size": "S",
+    "status": 1,
+    "price": 2.99
+  },
+  {
+    "id": 33,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/darted-straight-leg-trousers-p08741360.html?v1=477250161",
+    "size": "S",
+    "status": 1,
+    "price": 9.99
+  },
+  {
+    "id": 34,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/100-leather-midi-dress-p08073221.html?v1=462992703",
+    "size": "XS",
+    "status": 1,
+    "price": 19.99
+  },
+  {
+    "id": 35,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/zw-collection-oxford-shirt-p04043253.html?v1=493659739",
+    "size": "XS",
+    "status": 1,
+    "price": 7.99
+  },
+  {
+    "id": 36,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/ribbed-midi-skirt-p02756123.html?v1=466704789",
+    "size": "M",
+    "status": 1,
+    "price": 5.19
+  },
+  {
+    "id": 37,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/boat-neck-t-shirt-p00264456.html?v1=469502086",
+    "size": "S",
+    "status": 1,
+    "price": 3.99
+  },
+  {
+    "id": 38,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/jacquard-scarf-p03920846.html?v1=472982324",
+    "size": null,
+    "status": 1,
+    "price": 5.19
+  },
+  {
+    "id": 39,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/button-up-knit-hood-p01758656.html?v1=481140996",
+    "size": null,
+    "status": 1,
+    "price": 5.99
+  },
+  {
+    "id": 40,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/bandana-lace-cardigan-p06236117.html?v1=488380218",
+    "size": "S",
+    "status": 1,
+    "price": 12.99
+  },
+  {
+    "id": 42,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128&useHighContrastImages=true",
+    "size": "S",
+    "status": 1,
+    "price": 7.19
+  },
+  {
+    "id": 43,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/knit-top-with-contrast-trims-p05802030.html?v1=479777553",
     "size": "L",
     "status": 1,
-    "price": 13.79
+    "price": 7.99
+  },
+  {
+    "id": 44,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/boat-neck-t-shirt-p00264456.html?v1=469502086",
+    "size": "XS",
+    "status": 1,
+    "price": 3.99
+  },
+  {
+    "id": 45,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/tr/tr/yirtmacli-kalem-etek-zw-collection-p09110522.html?v1=483540711",
+    "size": "S",
+    "status": 1,
+    "price": 490
+  },
+  {
+    "id": 46,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128",
+    "size": "S",
+    "status": 1,
+    "price": 7.19
+  },
+  {
+    "id": 47,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/metallic-thread-applique-blouse-p07969222.html?v1=471082819",
+    "size": "XS",
+    "status": 1,
+    "price": 5.59
+  },
+  {
+    "id": 48,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/darted-straight-leg-trousers-p08741360.html?v1=477250161",
+    "size": "S",
+    "status": 1,
+    "price": 5.59
+  },
+  {
+    "id": 49,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/uk/en/diamond-knit-cardigan-with-belt-p02756122.html?v1=466704790",
+    "size": "M",
+    "status": 1,
+    "price": 10.79
+  },
+  {
+    "id": 50,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/100-leather-midi-dress-p08073221.html?v1=462992703",
+    "size": null,
+    "status": 1,
+    "price": 19.99
+  },
+  {
+    "id": 51,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/en/100-wool-belted-jacket-p02893119.html?v1=453717106",
+    "size": "S",
+    "status": 1,
+    "price": 12.99
+  },
+  {
+    "id": 52,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/de/strick-bandana-mit-brosche-p00653256.html?v1=457829841&origin=shopcart&useHighContrastImages=true",
+    "size": null,
+    "status": 1,
+    "price": 2.99
+  },
+  {
+    "id": 53,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/de/jacke-aus-100-wolle-mit-gurtel-p02893119.html?v1=453717106&useHighContrastImages=true",
+    "size": "S",
+    "status": 1,
+    "price": 12.99
+  },
+  {
+    "id": 54,
+    "userId": 1279780050,
+    "url": "https://www.zara.com/de/de/jacke-aus-100-wolle-mit-gurtel-p02893119.html?v1=453717106&useHighContrastImages=true",
+    "size": "XS",
+    "status": 1,
+    "price": 12.99
   }
 ]
