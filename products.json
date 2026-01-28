@@ -1,10 +1,20 @@
 [
   {
+    "id": 55,
+    "userId": 1279780050,
+    "url": "https://shop.mango.com/tr/tr/p/kad%C4%B1n/ceket/deri-gorunumlu/kurk-yakal%C4%B1-deri-gorunumlu-ceket_17078268",
+    "store": "mango",
+    "size": "S",
+    "status": 1,
+    "price": 2899.99
+  },
+  {
     "id": 2,
     "userId": 1279780050,
     "url": "https://www.zara.com/de/en/jacket-with-wool-and-pockets-p01255718.html?v1=480634333",
     "size": "S",
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -13,6 +23,7 @@
     "url": "https://www.zara.com/de/en/diamond-knit-cardigan-with-belt-p02756122.html?v1=466704790&useHighContrastImages=true",
     "size": "M",
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -21,6 +32,7 @@
     "url": "https://www.zara.com/de/en/ribbed-midi-skirt-p02756123.html?v1=466704789&useHighContrastImages=true",
     "size": "M",
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -29,6 +41,7 @@
     "url": "https://www.zara.com/de/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128&useHighContrastImages=true",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 9.99
   },
   {
@@ -37,6 +50,7 @@
     "url": "https://www.zara.com/de/en/cardigan-with-contrast-trims-p05536196.html?v1=465581326&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 7.99
   },
   {
@@ -45,6 +59,7 @@
     "url": "https://www.zara.com/de/en/jacquard-scarf-p03920846.html?v1=472982324&useHighContrastImages=true",
     "size": null,
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -53,6 +68,7 @@
     "url": "https://www.zara.com/de/en/ribbed-midi-skirt-p02756123.html?v1=466704789&useHighContrastImages=true",
     "size": "M",
     "status": 1,
+    "store": "zara",
     "price": 5.99
   },
   {
@@ -61,6 +77,7 @@
     "url": "https://www.zara.com/de/en/boat-neck-t-shirt-p00264456.html?v1=469502086&useHighContrastImages=true",
     "size": "M",
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -69,6 +86,7 @@
     "url": "https://www.zara.com/de/en/check-wrap-shirt-p09676506.html?v1=492177238",
     "size": "S",
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -77,6 +95,7 @@
     "url": "https://www.zara.com/uk/en/ribbed-midi-skirt-p02756123.html?v1=466704789",
     "size": "M",
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -85,6 +104,7 @@
     "url": "https://www.zara.com/de/en/oval-gem-earrings-p01599205.html?v1=476800616",
     "size": null,
     "status": 1,
+    "store": "zara",
     "price": 2.99
   },
   {
@@ -93,6 +113,7 @@
     "url": "https://www.zara.com/de/en/poplin-shirt-with-buttons-p08382593.html?v1=490754812",
     "size": "XS",
     "status": 0,
+    "store": "zara",
     "price": 9.99
   },
   {
@@ -101,6 +122,7 @@
     "url": "https://www.zara.com/de/en/ribbed-top-p01044152.html?v1=452729517&origin=shopcart",
     "size": "S",
     "status": 0,
+    "store": "zara",
     "price": 0
   },
   {
@@ -109,6 +131,7 @@
     "url": "https://www.zara.com/de/en/herringbone-balloon-bomber-jacket-p09385744.html?v1=487784704",
     "size": "XS",
     "status": 0,
+    "store": "zara",
     "price": 12.99
   },
   {
@@ -125,6 +148,7 @@
     "url": "https://www.zara.com/de/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 12.99
   },
   {
@@ -133,6 +157,7 @@
     "url": "https://www.zara.com/de/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 12.99
   },
   {
@@ -141,6 +166,7 @@
     "url": "https://www.zara.com/uk/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 11.99
   },
   {
@@ -149,6 +175,7 @@
     "url": "https://www.zara.com/uk/en/minimal-wool-bomber-jacket-zw-collection-p03736248.html?v1=466452129&useHighContrastImages=true",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 11.99
   },
   {
@@ -165,6 +192,7 @@
     "url": "https://www.zara.com/de/en/water-repellent-hooded-quilted-anorak-p04749822.html?v1=498003571&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 9.99
   },
   {
@@ -173,6 +201,7 @@
     "url": "https://www.zara.com/de/de/midirock-mit-gurtel-aus-leinen-p08116734.html?v1=477258549",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 9.99
   },
   {
@@ -181,6 +210,7 @@
     "url": "https://www.zara.com/de/de/strickjacke-mit-rautenmuster-und-gurtel-p02756122.html?v1=466704790",
     "size": "M",
     "status": 1,
+    "store": "zara",
     "price": 12.99
   },
   {
@@ -189,6 +219,7 @@
     "url": "https://www.zara.com/de/en/zw-collection-oxford-shirt-p04043253.html?v1=493659739",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 7.99
   },
   {
@@ -197,6 +228,7 @@
     "url": "https://www.zara.com/de/en/boat-neck-t-shirt-p00264456.html?v1=469502086",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 2.99
   },
   {
@@ -205,6 +237,7 @@
     "url": "https://www.zara.com/de/en/darted-straight-leg-trousers-p08741360.html?v1=477250161",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 9.99
   },
   {
@@ -213,6 +246,7 @@
     "url": "https://www.zara.com/uk/en/100-leather-midi-dress-p08073221.html?v1=462992703",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 19.99
   },
   {
@@ -221,6 +255,7 @@
     "url": "https://www.zara.com/uk/en/zw-collection-oxford-shirt-p04043253.html?v1=493659739",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 7.99
   },
   {
@@ -229,6 +264,7 @@
     "url": "https://www.zara.com/uk/en/ribbed-midi-skirt-p02756123.html?v1=466704789",
     "size": "M",
     "status": 1,
+    "store": "zara",
     "price": 5.19
   },
   {
@@ -237,6 +273,7 @@
     "url": "https://www.zara.com/uk/en/boat-neck-t-shirt-p00264456.html?v1=469502086",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 3.99
   },
   {
@@ -245,6 +282,7 @@
     "url": "https://www.zara.com/uk/en/jacquard-scarf-p03920846.html?v1=472982324",
     "size": null,
     "status": 1,
+    "store": "zara",
     "price": 5.19
   },
   {
@@ -253,6 +291,7 @@
     "url": "https://www.zara.com/de/en/button-up-knit-hood-p01758656.html?v1=481140996",
     "size": null,
     "status": 1,
+    "store": "zara",
     "price": 5.99
   },
   {
@@ -261,6 +300,7 @@
     "url": "https://www.zara.com/de/en/bandana-lace-cardigan-p06236117.html?v1=488380218",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 12.99
   },
   {
@@ -269,6 +309,7 @@
     "url": "https://www.zara.com/uk/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128&useHighContrastImages=true",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 7.19
   },
   {
@@ -277,6 +318,7 @@
     "url": "https://www.zara.com/de/en/knit-top-with-contrast-trims-p05802030.html?v1=479777553",
     "size": "L",
     "status": 1,
+    "store": "zara",
     "price": 7.99
   },
   {
@@ -285,6 +327,7 @@
     "url": "https://www.zara.com/uk/en/boat-neck-t-shirt-p00264456.html?v1=469502086",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 3.99
   },
   {
@@ -293,6 +336,7 @@
     "url": "https://www.zara.com/tr/tr/yirtmacli-kalem-etek-zw-collection-p09110522.html?v1=483540711",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 490
   },
   {
@@ -301,6 +345,7 @@
     "url": "https://www.zara.com/uk/en/short-dress-with-pleats-and-pockets-p08839777.html?v1=494646128",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 7.19
   },
   {
@@ -309,6 +354,7 @@
     "url": "https://www.zara.com/uk/en/metallic-thread-applique-blouse-p07969222.html?v1=471082819",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 5.59
   },
   {
@@ -317,6 +363,7 @@
     "url": "https://www.zara.com/uk/en/darted-straight-leg-trousers-p08741360.html?v1=477250161",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 5.59
   },
   {
@@ -325,6 +372,7 @@
     "url": "https://www.zara.com/uk/en/diamond-knit-cardigan-with-belt-p02756122.html?v1=466704790",
     "size": "M",
     "status": 1,
+    "store": "zara",
     "price": 10.79
   },
   {
@@ -333,6 +381,7 @@
     "url": "https://www.zara.com/de/en/100-leather-midi-dress-p08073221.html?v1=462992703",
     "size": null,
     "status": 1,
+    "store": "zara",
     "price": 19.99
   },
   {
@@ -341,6 +390,7 @@
     "url": "https://www.zara.com/de/en/100-wool-belted-jacket-p02893119.html?v1=453717106",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 12.99
   },
   {
@@ -349,6 +399,7 @@
     "url": "https://www.zara.com/de/de/strick-bandana-mit-brosche-p00653256.html?v1=457829841&origin=shopcart&useHighContrastImages=true",
     "size": null,
     "status": 1,
+    "store": "zara",
     "price": 2.99
   },
   {
@@ -357,6 +408,7 @@
     "url": "https://www.zara.com/de/de/jacke-aus-100-wolle-mit-gurtel-p02893119.html?v1=453717106&useHighContrastImages=true",
     "size": "S",
     "status": 1,
+    "store": "zara",
     "price": 12.99
   },
   {
@@ -365,6 +417,16 @@
     "url": "https://www.zara.com/de/de/jacke-aus-100-wolle-mit-gurtel-p02893119.html?v1=453717106&useHighContrastImages=true",
     "size": "XS",
     "status": 1,
+    "store": "zara",
     "price": 12.99
+  },
+  {
+    "id": 55,
+    "userId": 1279780050,
+    "url": "https://shop.mango.com/tr/tr/p/kad%C4%B1n/elbise-ve-tulum/buyuk-beden/asimetrik-yaka-evaze-elbise_17047137?c=70",
+    "store": "mango",
+    "size": "XS",
+    "status": 1,
+    "price": 1299.99
   }
 ]

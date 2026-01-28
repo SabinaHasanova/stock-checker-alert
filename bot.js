@@ -6,6 +6,9 @@ import 'dotenv/config';
 const TOKEN = process.env.BOT_TOKEN;
 const PRODUCTS_FILE = path.resolve(process.cwd(), 'products.json');
 
+// ✅ Add stores here (just extend this array in the future)
+const STORES = ['zara', 'mango'];
+
 const bot = new TelegramBot(TOKEN, { polling: true });
 const userStates = {};
 
@@ -20,14 +23,9 @@ function loadProducts() {
     return JSON.parse(data || '[]');
   } catch (err) {
     console.error('Failed to load products file:', err.message);
-    return [];
+    return []; // ✅ important
   }
 }
-
-/*
-  sendStoreMenu(chatId)
-  - Sends the initial store selection keyboard to the user.
-*/
 
 function saveProducts(products) {
   try {
@@ -41,19 +39,24 @@ function saveProducts(products) {
    Menus
 ======================= */
 
+function titleCase(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
+
 function sendStoreMenu(chatId) {
+  // Build keyboard rows: 2 stores per row
+  const rows = [];
+  for (let i = 0; i < STORES.length; i += 2) {
+    rows.push(STORES.slice(i, i + 2).map(titleCase));
+  }
+
   bot.sendMessage(chatId, '🏬 Select store:', {
     reply_markup: {
-      keyboard: [['Zara']],
+      keyboard: rows,
       resize_keyboard: true
     }
   });
 }
-
-/*
-  sendMainMenu(chatId)
-  - Sends the main action keyboard (add/list/pause/resume/delete).
-*/
 
 function sendMainMenu(chatId) {
   bot.sendMessage(chatId, '📋 Menu', {
@@ -62,17 +65,13 @@ function sendMainMenu(chatId) {
         ['➕ Add product'],
         ['📋 My products'],
         ['⏸️ Pause product', '▶️ Resume product'],
-        ['❌ Delete product']
+        ['❌ Delete product'],
+        ['🏬 Change store']
       ],
       resize_keyboard: true
     }
   });
 }
-
-/*
-  sendProductsMenu(chatId)
-  - Sends a keyboard to choose between active/paused products.
-*/
 
 function sendProductsMenu(chatId) {
   bot.sendMessage(chatId, 'Select product type:', {
@@ -86,11 +85,6 @@ function sendProductsMenu(chatId) {
     }
   });
 }
-
-/*
-  sendSizeMenu(chatId)
-  - Asks the user for a size or allows skipping (one-time keyboard).
-*/
 
 function sendSizeMenu(chatId) {
   bot.sendMessage(chatId, 'Enter size or choose Skip:', {
@@ -109,11 +103,6 @@ function sendSizeMenu(chatId) {
 function setState(chatId, data) {
   userStates[chatId] = { ...(userStates[chatId] || {}), ...data };
 }
-
-/*
-  resetStep(chatId)
-  - Reset in-memory conversation step/action for a user.
-*/
 
 function resetStep(chatId) {
   if (userStates[chatId]) {
@@ -143,12 +132,21 @@ bot.on('message', msg => {
 
   const state = userStates[chatId] || {};
 
-  /* ---------- Store selection ---------- */
+  /* ---------- Change store (from main menu) ---------- */
+  if (text === '🏬 Change store') {
+    resetStep(chatId);
+    setState(chatId, { step: 'select_store' });
+    sendStoreMenu(chatId);
+    return;
+  }
 
+  /* ---------- Store selection ---------- */
   if (state.step === 'select_store') {
-    if (text === 'Zara') {
-      setState(chatId, { store: 'zara', step: null });
-      bot.sendMessage(chatId, '✅ Zara selected');
+    const storeKey = text.toLowerCase();
+
+    if (STORES.includes(storeKey)) {
+      setState(chatId, { store: storeKey, step: null });
+      bot.sendMessage(chatId, `✅ ${titleCase(storeKey)} selected`);
       sendMainMenu(chatId);
     } else {
       bot.sendMessage(chatId, 'Please select a store from the list.');
@@ -157,8 +155,13 @@ bot.on('message', msg => {
   }
 
   /* ---------- Add product flow ---------- */
-
   if (text === '➕ Add product') {
+    if (!state.store) {
+      setState(chatId, { step: 'select_store' });
+      sendStoreMenu(chatId);
+      return;
+    }
+
     setState(chatId, { step: 'await_url' });
     bot.sendMessage(chatId, '🔗 Send product link:');
     return;
@@ -175,31 +178,35 @@ bot.on('message', msg => {
     const products = loadProducts();
 
     // ✅ DUPLICATE CHECK (same user + same url + same size)
-  const normalizedUrl = (state.url || '').trim();
-  const normalizedSize = (size || '').trim().toLowerCase(); // null olarsa ""
+    const normalizedUrl = (state.url || '').trim();
+    const normalizedSize = (size || '').trim().toLowerCase();
 
-  const alreadyExists = products.some(p => {
-    if (p.userId !== chatId) return false;
+    const alreadyExists = products.some(p => {
+      if (p.userId !== chatId) return false;
 
-    const pUrl = (p.url || '').trim();
-    const pSize = (p.size || '').trim().toLowerCase();
+      const pUrl = (p.url || '').trim();
+      const pSize = (p.size || '').trim().toLowerCase();
 
-    // eyni url + eyni size (ikisi də null ola bilər)
-    return pUrl === normalizedUrl && pSize === normalizedSize;
-  });
+      return pUrl === normalizedUrl && pSize === normalizedSize;
+    });
 
-  if (alreadyExists) {
-    bot.sendMessage(chatId, `⚠️ This product is already added.\nUrl: ${normalizedUrl}\nSize: ${size ?? 'N/A'}`);
-    resetStep(chatId);
-    sendMainMenu(chatId);
-    return;
-  }
+    if (alreadyExists) {
+      bot.sendMessage(
+        chatId,
+        `⚠️ This product is already added.\nUrl: ${normalizedUrl}\nSize: ${size ?? 'N/A'}`
+      );
+      resetStep(chatId);
+      sendMainMenu(chatId);
+      return;
+    }
+
     const id = products.length ? products.at(-1).id + 1 : 1;
 
     products.push({
       id,
       userId: chatId,
       url: state.url,
+      store: state.store, // ✅ store saved
       size,
       status: 1,
       price: 0
@@ -218,8 +225,13 @@ bot.on('message', msg => {
   }
 
   /* ---------- My products ---------- */
-
   if (text === '📋 My products') {
+    if (!state.store) {
+      setState(chatId, { step: 'select_store' });
+      sendStoreMenu(chatId);
+      return;
+    }
+
     setState(chatId, { step: 'products_menu' });
     sendProductsMenu(chatId);
     return;
@@ -242,7 +254,6 @@ bot.on('message', msg => {
   }
 
   /* ---------- Actions ---------- */
-
   if (text === '⏸️ Pause product') return askForAction(chatId, 'pause');
   if (text === '▶️ Resume product') return askForAction(chatId, 'resume');
   if (text === '❌ Delete product') return askForAction(chatId, 'remove');
@@ -262,14 +273,8 @@ function askForAction(chatId, action) {
   bot.sendMessage(chatId, 'Enter product ID:');
 }
 
-/*
-  handleProductAction(chatId, id)
-  - Perform the requested action (pause/resume/remove) on a product
-    owned by the requesting user. Sends confirmation messages.
-*/
-
 function handleProductAction(chatId, id) {
-  const state = userStates[chatId];
+  const state = userStates[chatId] || {};
   let products = loadProducts();
 
   const product = products.find(p => p.id === id && p.userId === chatId);
@@ -293,19 +298,18 @@ function handleProductAction(chatId, id) {
   sendMainMenu(chatId);
 }
 
-/*
-  showProducts(chatId, status)
-  - Sends a list of products for the given `status` (1 active, 0 paused)
-    that belong to the requesting user.
-*/
-
 /* =======================
    Product listing
 ======================= */
 
 function showProducts(chatId, status) {
-  const products = loadProducts().filter(
-    p => p.userId === chatId && p.status === status
+  const state = userStates[chatId] || {};
+  const selectedStore = state.store;
+
+  const products = loadProducts().filter(p =>
+    p.userId === chatId &&
+    p.status === status &&
+    p.store === selectedStore
   );
 
   if (!products.length) {

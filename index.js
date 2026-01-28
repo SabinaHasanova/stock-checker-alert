@@ -2,28 +2,37 @@ import 'dotenv/config';
 import fs from 'fs';
 import cron from 'node-cron';
 import { chromium } from 'playwright';
-import { checkZaraAvailability } from './scraper.js';
-import { sendTelegramNotification,sendTelegramErrorNotification  } from './notifier.js';
+import { checkZaraAvailability, checkMangoAvailability } from './scraper.js';
+import { sendTelegramNotification, sendTelegramErrorNotification } from './notifier.js';
 import pLimit from 'p-limit';
 
 const limit = pLimit(3);
 
-
 /*
   loadProducts()
   - Read and parse the `products.json` file from disk.
-  - Returns an array of product objects (or throws if file is invalid).
+  - Returns an array of product objects.
 */
 function loadProducts() {
-  return JSON.parse(fs.readFileSync('./products.json'));
+  try {
+    return JSON.parse(fs.readFileSync('./products.json', 'utf8'));
+  } catch (e) {
+    console.error('Failed to read products.json:', e.message);
+    return [];
+  }
 }
+
+// ✅ Store → checker mapping
+const STORE_CHECKERS = {
+  zara: checkZaraAvailability,
+  mango: checkMangoAvailability
+};
 
 /*
   runStockCheck()
-  - Main worker that loads products, creates a shared Playwright
-    browser/context for the run, and checks active products in parallel.
-  - Sends Telegram notifications for in-stock or price-drop events
-    and persists updated product state back to disk.
+  - Loads products, creates a shared Playwright browser/context,
+    checks active products in parallel (limited),
+    sends Telegram notifications, and saves products back to disk.
 */
 async function runStockCheck() {
   const products = loadProducts();
@@ -41,7 +50,16 @@ async function runStockCheck() {
     const HEADLESS = process.env.HEADLESS ? process.env.HEADLESS === 'true' : false;
     const SLOW_MO = process.env.SLOW_MO ? Number(process.env.SLOW_MO) : 50;
 
-    browser = await chromium.launch({ headless: HEADLESS, slowMo: SLOW_MO, args: ['--disable-blink-features=AutomationControlled', '--no-sandbox', '--disable-setuid-sandbox'] });
+    browser = await chromium.launch({
+      headless: HEADLESS,
+      slowMo: SLOW_MO,
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ]
+    });
+
     context = await browser.newContext({
       viewport: { width: 800, height: 800 },
       locale: 'de-DE',
@@ -55,15 +73,22 @@ async function runStockCheck() {
     const tasks = activeProducts.map(product =>
       limit(async () => {
         try {
-          const inStock = await checkZaraAvailability(product, 0, browser, context);
+          const store = (product.store || '').toLowerCase();
+          const checker = STORE_CHECKERS[store];
+
+          if (!checker) {
+            console.log(`Unknown store for product ID ${product.id}:`, product.store);
+            return;
+          }
+
+          const inStock = await checker(product, 0, browser, context);
 
           if (inStock) {
             await sendTelegramNotification(
               product.userId,
-              `🔥 IN STOCK!\nID: ${product.id}\nSize: ${product.size ?? 'ANY'}\n${product.url}`
+              `🔥 IN STOCK!\nStore: ${store}\nID: ${product.id}\nSize: ${product.size ?? 'ANY'}\n${product.url}`
             );
           }
-
         } catch (err) {
           console.log('Global stock check error:', err.message);
 
@@ -85,7 +110,7 @@ async function runStockCheck() {
 /*
   validateEnv()
   - Check for required environment variables and emit a console warning
-    if any are missing. Does not throw — informational only.
+    if any are missing. Informational only.
 */
 function validateEnv() {
   const missing = [];
@@ -98,10 +123,12 @@ function validateEnv() {
   }
 }
 
+validateEnv();
 
-
+// run once immediately
 await runStockCheck();
 
+// then every 2 minutes
 cron.schedule('*/2 * * * *', async () => {
   await runStockCheck();
 });
